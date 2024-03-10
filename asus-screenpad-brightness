@@ -1,0 +1,95 @@
+#!/bin/bash
+
+get_brightness() {
+    cat /sys/class/backlight/asus_screenpad/brightness
+}
+
+get_max_brightness() {
+    cat /sys/class/backlight/asus_screenpad/max_brightness
+}
+
+set_brightness() {
+    echo "$1" | tee /sys/class/backlight/asus_screenpad/brightness > /dev/null
+}
+
+set_max_brightness() {
+    tee /sys/class/backlight/asus_screenpad/brightness <<< "$(get_max_brightness)" > /dev/null
+    echo "Maximum brightness set."
+}
+
+set_min_brightness() {
+    set_brightness 0
+    echo "Minimum brightness set."
+}
+
+increase_brightness() {
+    current_brightness=$(get_brightness)
+    max_brightness=$(get_max_brightness)
+    new_brightness=$((current_brightness + 47))
+    if [ "$new_brightness" -gt "$max_brightness" ]; then
+        new_brightness="$max_brightness"
+        echo "Brightness is already at maximum."
+    else
+        set_brightness "$new_brightness"
+        echo "Brightness increased."
+    fi
+}
+
+decrease_brightness() {
+    current_brightness=$(get_brightness)
+    new_brightness=$((current_brightness - 47))
+    if [ "$new_brightness" -lt 0 ]; then
+        new_brightness=0
+        echo "Brightness is already at minimum."
+    else
+        set_brightness "$new_brightness"
+        echo "Brightness decreased."
+    fi
+}
+
+set_permissions() {
+    sudo chmod ugoa+w /sys/class/backlight/asus_screenpad/brightness
+    echo "Permissions set to make brightness file writable."
+}
+
+help_message() {
+    echo "Usage: asus-screenpad-brightness [option]"
+    echo "Options:"
+    echo "    minimum          Set minimum brightness"
+    echo "    maximum          Set maximum brightness"
+    echo "    increase         Increase brightness"
+    echo "    decrease         Decrease brightness"
+    echo "    set-permissions  Make brightness file writable"
+    echo "    help             Show help message"
+}
+
+if [ "$#" -ne 1 ]; then
+    help_message
+    exit 1
+fi
+
+case "$1" in
+    "minimum")
+        set_min_brightness
+        ;;
+    "maximum")
+        set_max_brightness
+        ;;
+    "increase")
+        increase_brightness
+        ;;
+    "decrease")
+        decrease_brightness
+        ;;
+    "set-permissions")
+        set_permissions
+        ;;
+    "help")
+        help_message
+        ;;
+    *)
+        echo "Invalid option: $1"
+        help_message
+        ;;
+esac
+
