@@ -25,7 +25,7 @@ set_min_brightness() {
 increase_brightness() {
     current_brightness=$(get_brightness)
     max_brightness=$(get_max_brightness)
-    new_brightness=$((current_brightness + 47))
+    new_brightness=$((current_brightness + 18))
     if [ "$new_brightness" -gt "$max_brightness" ]; then
         new_brightness="$max_brightness"
         echo "Brightness is already at maximum."
@@ -37,7 +37,7 @@ increase_brightness() {
 
 decrease_brightness() {
     current_brightness=$(get_brightness)
-    new_brightness=$((current_brightness - 47))
+    new_brightness=$((current_brightness - 18))
     if [ "$new_brightness" -lt 0 ]; then
         new_brightness=0
         echo "Brightness is already at minimum."
