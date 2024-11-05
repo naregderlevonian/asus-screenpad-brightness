@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Copy asus-screenpad-brightness.service to /lib/systemd/system/
 sudo cp asus-screenpad-brightness.service /lib/systemd/system/
